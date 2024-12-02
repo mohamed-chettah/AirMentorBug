@@ -253,6 +253,4 @@ announcements.get("/search/:q", async (c) => {
   }
 });
 
-// TODO ADD ROUTE FOR REVIEW HERE
-
 export default announcements;
