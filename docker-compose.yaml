@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./AirmentorApi
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Port local -> backend
+    volumes:
+      - ./AirmentorApi:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      NODE_ENV: development
+
+  frontend:
+    build:
+      context: ./AirmentorApp
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000" # Port local -> frontend
+    volumes:
+      - ./AirmentorApp:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - backend
