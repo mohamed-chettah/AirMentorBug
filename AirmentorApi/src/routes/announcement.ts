@@ -4,6 +4,8 @@ import { isValidObjectId } from "mongoose";
 import { Announcement } from "../models/announcement";
 import { Categorie } from "../models/categorie";
 import { Skill } from "../models/skill";
+import DOMPurify from "dompurify";
+
 
 const announcements = new Hono().basePath("/announcements");
 
@@ -37,15 +39,75 @@ announcements.get("/:id", async (c) => {
   return c.json({ msg: "ObjectId malformed" }, 400);
 });
 
+announcements.get("/category/:id", async (c: Context) => {
+
+  const categoryId = c.req.param("id");
+
+  const announcements = await Announcement.find({
+    is_activate: true,
+    skills: { $in: await Skill.find({ categories: categoryId }).select("_id") },
+  }).populate("skills createdBy");
+
+  // Vulnérabilité : Retourner le HTML brut sans échappement
+  const htmlResponse = announcements
+    .map(
+      (a) =>
+        `<div><h2>${a.title}</h2><p>${a.description}</p><p>By: ${a.createdBy?.name}</p></div>`
+    )
+    .join("");
+
+  return c.html(htmlResponse);
+
+});
+
+// announcements.post("/", async (c) => {
+//   const body = await c.req.json();
+
+//   try {
+//     // Vulnérabilité : Acceptation des données utilisateur sans validation ni échappement
+//     const newAnnouncement = new Announcement(body);
+//     const saveAnnouncement = await newAnnouncement.save();
+
+//     // Retourne les données créées directement, y compris le script malveillant
+//     return c.json(saveAnnouncement, 201);
+//   } catch (error: unknown) {
+//     return c.json(
+//       {
+//         message: "Error creating announcement",
+//         // @ts-ignore
+//         details: error._message,
+//       },
+//       400
+//     );
+//   }
+// });
+
 announcements.post("/", async (c) => {
   const body = await c.req.json();
+
   try {
+    // Vulnérabilité : accepter les données telles quelles, sans validation ni nettoyage
     const newAnnouncement = new Announcement(body);
     const saveAnnouncement = await newAnnouncement.save();
-    return c.json(saveAnnouncement, 201);
+
+    // Vulnérabilité : inclure les données directement dans la réponse, sans échappement
+    return c.html(`
+      <div>
+        <h1>Announcement Created</h1>
+        <p>Title: ${saveAnnouncement.title}</p>
+        <p>Description: ${saveAnnouncement.description}</p>
+        <p>Created By: ${saveAnnouncement.createdBy}</p>
+      </div>
+    `);
   } catch (error: unknown) {
-    // @ts-ignore
-    return c.json(error._message, 400);
+    return c.json(
+      {
+        message: "Error creating announcement",
+        // @ts-ignore
+        details: error._message,
+      },
+      400
+    );
   }
 });
 
