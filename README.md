@@ -243,3 +243,76 @@ Cette requête peut permettre à l'attaquant d'accéder à des annonces désacti
 
 3. **Conformité avec les règles métier** :
    - Seules les annonces actives (`is_activate: true`) correspondant au terme recherché sont retournées.
+
+### 3.  Faille XSS
+
+# Description:
+Une faille XSS (Cross-Site Scripting) se produit lorsqu'un site web permet à un utilisateur malveillant d'insérer du code JavaScript (ou d'autres scripts) dans une page web qui sera ensuite exécuté par d'autres utilisateurs.
+
+# Exploitation: 
+
+Saisir dans un champ de formulaire du code malveillant tel que :
+
+```jsx
+<script>alert('XSS Attack!');</script>
+ou
+<img src="https://img.cuisineaz.com/660x660/2022/02/23/i183021-couscous-traditionnel-aux-legumes.jpeg" alt="Girl in a jacket" width="500" height="600">
+```
+
+Faille : 
+
+```jsx
+announcements.post("/", async (c) => {
+  const body = await c.req.json();
+
+  try {
+    // Vulnérabilité : accepter les données telles quelles, sans validation ni nettoyage
+    const newAnnouncement = new Announcement(body);
+    const saveAnnouncement = await newAnnouncement.save();
+
+    // Vulnérabilité : inclure les données directement dans la réponse, sans échappement
+    return c.html(
+      <div>
+        <h1>Announcement Created</h1>
+        <p>Title: ${saveAnnouncement.title}</p>
+        <p>Description: ${saveAnnouncement.description}</p>
+        <p>Created By: ${saveAnnouncement.createdBy}</p>
+      </div>
+    );
+  } catch (error: unknown) {
+    return c.json(
+      {
+        message: "Error creating announcement",
+        // @ts-ignore
+        details: error._message,
+      },
+      400
+    );
+  }
+});
+```
+# Solution: 
+
+```jsx
+announcements.post("/", async (c) => {
+  const body = await c.req.json();
+
+  try {
+    // Vulnérabilité : Acceptation des données utilisateur sans validation ni échappement
+    const newAnnouncement = new Announcement(body);
+    const saveAnnouncement = await newAnnouncement.save();
+
+    // Retourne les données créées directement, y compris le script malveillant
+    return c.json(saveAnnouncement, 201);
+  } catch (error: unknown) {
+    return c.json(
+      {
+        message: "Error creating announcement",
+        // @ts-ignore
+        details: error._message,
+      },
+      400
+    );
+  }
+});
+```
