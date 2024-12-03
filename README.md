@@ -36,6 +36,23 @@ GET / api / admin / dashboard;
 Authorization: Bearer[token_with_role_user];
 ```
 
+Faille :
+
+```jsx
+const matchingRule = rules.find(
+  (rule) => path.startsWith(rule.path) && rule.methods.includes(method) && rule.roles.includes(role)
+);
+
+// Faille : Permet l'accès si aucune règle stricte ne correspond mais que l'utilisateur a au moins un rôle
+if (!matchingRule) {
+  console.log("! No strict matching rule found, allowing access based on role fallback.");
+  if (role) { // Permissivité : n'importe quel rôle permet d'accéder
+    return next();
+  }
+}
+
+```
+
 ### **Impact** :
 
 - Accès non autorisé à des données sensibles.
