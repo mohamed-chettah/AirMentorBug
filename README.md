@@ -262,6 +262,10 @@ ou
 ![image](https://github.com/user-attachments/assets/b1f2ac13-8ddf-4805-9c8b-8b158318ba60)
 On voit que l'image est rendu alors qu'on devrait avoir un texte.
 
+Une fois fixé: 
+![image](https://github.com/user-attachments/assets/d29a3d2d-245d-4263-b650-e745215d3d22)
+
+
 Faille : 
 
 ```jsx
