@@ -18,12 +18,6 @@ L'objectif est de montrer aux développeurs comment identifier, exploiter, et co
 - Une **faille de logique d'autorisation** survient lorsque le mécanisme de contrôle d'accès est mal implémenté, permettant à des utilisateurs non autorisés d'accéder à des ressources ou d'exécuter des actions normalement interdites.
 - Dans ce cas précis, la condition permissive permet à un utilisateur d'accéder à une ressource dès qu'il a un rôle quelconque, même si ce rôle n'est pas autorisé pour la ressource ou l'action demandée.
 
-
-### **Description** :
-
-- Une **faille de logique d'autorisation** survient lorsque le mécanisme de contrôle d'accès est mal implémenté, permettant à des utilisateurs non autorisés d'accéder à des ressources ou d'exécuter des actions normalement interdites.
-- Dans ce cas précis, la condition permissive permet à un utilisateur d'accéder à une ressource dès qu'il a un rôle quelconque, même si ce rôle n'est pas autorisé pour la ressource ou l'action demandée.
-
 ### **Exploitation** :
 
 - Un attaquant peut manipuler un token JWT pour inclure un rôle minimal valide (ex. : "USER").
@@ -66,5 +60,4 @@ if (!matchingRule) {
   console.log("! No matching rule found, denying access.");
   return context.json({ message: "Forbidden" }, 403);
 }
-
 ```
