@@ -258,6 +258,9 @@ Saisir dans un champ de formulaire du code malveillant tel que :
 ou
 <img src="https://img.cuisineaz.com/660x660/2022/02/23/i183021-couscous-traditionnel-aux-legumes.jpeg" alt="Girl in a jacket" width="500" height="600">
 ```
+ Rendu de la faille :
+![image](https://github.com/user-attachments/assets/b1f2ac13-8ddf-4805-9c8b-8b158318ba60)
+On voit que l'image est rendu alors qu'on devrait avoir un texte.
 
 Faille : 
 
