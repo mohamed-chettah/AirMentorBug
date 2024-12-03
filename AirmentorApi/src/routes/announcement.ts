@@ -8,7 +8,11 @@ import { Skill } from "../models/skill";
 const announcements = new Hono().basePath("/announcements");
 
 announcements.get("/", async (c) => {
-  const announcement = await Announcement.find({ is_activate: true }, {}, { populate: "skills" });
+  const announcement = await Announcement.find(
+    { is_activate: true },
+    {},
+    { populate: "skills" }
+  );
   return c.json(announcement);
 });
 
@@ -110,7 +114,9 @@ announcements.put("/:id", async (c) => {
   };
   // par défaut il va faire un $set
 
-  const tryToUpdate = await Announcement.findOneAndUpdate(q, updateQuery, { new: true });
+  const tryToUpdate = await Announcement.findOneAndUpdate(q, updateQuery, {
+    new: true,
+  });
   return c.json(tryToUpdate, 200);
 });
 // en patch, on va "append" les éléments passés dans le body
@@ -135,7 +141,9 @@ announcements.patch("/:id", async (c) => {
     },
   };
 
-  const tryToUpdate = await Announcement.findOneAndUpdate(q, updateQuery, { new: true });
+  const tryToUpdate = await Announcement.findOneAndUpdate(q, updateQuery, {
+    new: true,
+  });
   return c.json(tryToUpdate, 200);
 });
 
@@ -152,7 +160,9 @@ announcements.delete("/:id", async (c) => {
 announcements.get("/creator/:id", async (c) => {
   const _id = c.req.param("id");
   try {
-    const announcement = await Announcement.find({ createdBy: _id }).populate("createdBy");
+    const announcement = await Announcement.find({ createdBy: _id }).populate(
+      "createdBy"
+    );
     return c.json(announcement);
   } catch (error: unknown) {
     // @ts-ignore
@@ -163,22 +173,38 @@ announcements.get("/creator/:id", async (c) => {
 // Search announcements by title
 announcements.get("/search/:q", async (c) => {
   const searchQuery = c.req.param("q");
+
   if (!searchQuery) {
     return c.json({ msg: "Query parameter is missing" }, 400);
   }
 
   try {
-    const announcements = await Announcement.find(
-      {
+    let filter;
+
+    // Vérifiez si le paramètre est une chaîne JSON valide
+    try {
+      const parsedQuery = JSON.parse(decodeURIComponent(searchQuery));
+      if (typeof parsedQuery === "object" && parsedQuery !== null) {
+        // Si c'est un objet JSON, utilisez-le comme filtre
+        filter = parsedQuery;
+      } else {
+        throw new Error("Invalid JSON");
+      }
+    } catch {
+      // Si ce n'est pas un JSON, appliquez la recherche par regex par défaut
+      filter = {
         title: { $regex: searchQuery, $options: "i" },
         is_activate: true,
-      },
-      {
-        title: 1, // Include title
-        _id: 1, // Include _id
-      }
-    );
+      };
+    }
 
+    // Effectuez la recherche dans MongoDB
+    const announcements = await Announcement.find(filter, {
+      title: 1, // Inclure uniquement le titre
+      _id: 1, // Inclure uniquement l'identifiant
+    });
+
+    // Formatez les résultats
     const formattedResults = announcements.map((announcement) => ({
       title: announcement.title,
       id: announcement._id,
