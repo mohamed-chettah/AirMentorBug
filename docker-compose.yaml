@@ -1,12 +1,19 @@
 version: '3.8'
 
+networks:
+    airmentor-network:
+        driver: bridge
+
 services:
+
   backend:
+    networks:
+        - airmentor-network
     build:
       context: ./AirmentorApi
       dockerfile: Dockerfile
     ports:
-      - "3000:3000" # Port local -> backend
+      - "3001:3001" # Port local -> backend
     volumes:
       - ./AirmentorApi:/usr/src/app
       - /usr/src/app/node_modules
@@ -14,11 +21,13 @@ services:
       NODE_ENV: development
 
   frontend:
+    networks:
+        - airmentor-network
     build:
       context: ./AirmentorApp
       dockerfile: Dockerfile
     ports:
-      - "3001:3000" # Port local -> frontend
+      - "3000:3000" # Port local -> frontend
     volumes:
       - ./AirmentorApp:/usr/src/app
       - /usr/src/app/node_modules
