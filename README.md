@@ -350,7 +350,7 @@ users.get("/", limiter, async (c) => {
 ```
 Maintenant lorqu'un utilisateur dépasse les 10 requetes l'utilisateur est bloqué 
 
-### 5. Exposition de fichiers sensibles
+# 5. Exposition de fichiers sensibles
 
 # Description:
 Une Exposition de fichiers sensibles se produit lorsqu'un site web permet à un utilisateur malveillant de naviguer dans les fichiers de l'application en manipulant l'url de l'application.
@@ -359,18 +359,9 @@ Une Exposition de fichiers sensibles se produit lorsqu'un site web permet à un 
 
 Saisir dans un champ de formulaire du code malveillant tel que :
 
-```jsx
-<script>alert('XSS Attack!');</script>
-ou
-<img src="https://img.cuisineaz.com/660x660/2022/02/23/i183021-couscous-traditionnel-aux-legumes.jpeg" alt="Girl in a jacket" width="500" height="600">
-```
  Rendu de la faille :
 ![image](./imgReadme/notokay.png)
 On voit que les credentials de l'utilisateur admin utilisé par les administrateurs de l'application alors qu'il devrait être guarder en sécurité et pas disponible aux utilisateurs.
-
-Une fois fixé: 
-![image](https://github.com/user-attachments/assets/d29a3d2d-245d-4263-b650-e745215d3d22)
-
 
 Faille : 
 
