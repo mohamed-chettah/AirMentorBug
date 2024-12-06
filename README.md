@@ -323,3 +323,29 @@ announcements.post("/", async (c) => {
   }
 });
 ```
+
+# 4 Limite du nombre de requete
+
+Actuellement, un utilisateur peut envoyer un nombre illimité de requetes. Ce qui peut ammener à des faille avec du brute force.
+
+### Resolution du problème
+
+```jsx
+import { rateLimiter } from "hono-rate-limiter";
+
+const limiter = rateLimiter({
+  windowMs: 5 * 60 * 1000, // 15 minutes
+  limit: 10, 
+  standardHeaders: 'draft-7',
+  message: 'Too many requests, please try again later',
+  keyGenerator: (c) => {
+    return c.req.header('x-forwarded-for') || c.req.ip || 'unknown';
+  }
+});
+
+users.get("/", limiter, async (c) => {
+  const user = await User.find({}).populate("registredAnnouncement");
+  return c.json(user);
+});
+```
+Maintenant lorqu'un utilisateur dépasse les 10 requetes l'utilisateur est bloqué 
