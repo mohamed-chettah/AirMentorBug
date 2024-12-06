@@ -349,3 +349,64 @@ users.get("/", limiter, async (c) => {
 });
 ```
 Maintenant lorqu'un utilisateur dépasse les 10 requetes l'utilisateur est bloqué 
+
+### 5. Exposition de fichiers sensibles
+
+# Description:
+Une Exposition de fichiers sensibles se produit lorsqu'un site web permet à un utilisateur malveillant de naviguer dans les fichiers de l'application en manipulant l'url de l'application.
+
+# Exploitation: 
+
+Saisir dans un champ de formulaire du code malveillant tel que :
+
+```jsx
+<script>alert('XSS Attack!');</script>
+ou
+<img src="https://img.cuisineaz.com/660x660/2022/02/23/i183021-couscous-traditionnel-aux-legumes.jpeg" alt="Girl in a jacket" width="500" height="600">
+```
+ Rendu de la faille :
+![image](./imgReadme/notokay.png)
+On voit que les credentials de l'utilisateur admin utilisé par les administrateurs de l'application alors qu'il devrait être guarder en sécurité et pas disponible aux utilisateurs.
+
+Une fois fixé: 
+![image](https://github.com/user-attachments/assets/d29a3d2d-245d-4263-b650-e745215d3d22)
+
+
+Faille : 
+
+```jsx
+app.get("/:filename", (c: Context) => {
+  console.log("hello")
+  const filename = c.req.param("filename");
+  const filePath = path.join(__dirname, filename);
+
+  if (fs.existsSync(filePath)) {
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    return c.text(fileContent);
+  } else {
+    return c.text("File not found", 404);
+  }
+});
+```
+
+# Solution:
+// ne pas mettre ce bout de code dans l'application 
+```jsx
+app.get("/:filename", (c: Context) => {
+  console.log("hello")
+  const filename = c.req.param("filename");
+  const filePath = path.join(__dirname, filename);
+
+  if (fs.existsSync(filePath)) {
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    return c.text(fileContent);
+  } else {
+    return c.text("File not found", 404);
+  }
+});
+```
+
+De plus, il faudrait:
+
+- Ne pas stocker les credentials dans un fichier qui peut être accessible par les utilisateur
+- Mettre en place une roation de mot de passe pour le compte utilisateur

@@ -1,6 +1,8 @@
 import { serve } from "@hono/node-server";
 import { Context, Hono } from "hono";
 import { cors } from "hono/cors";
+import * as fs from "fs";
+import * as path from "path";
 import * as _jsonwebtoken from "jsonwebtoken";
 import { sign as signType, verify as verifyType } from "jsonwebtoken";
 import WebSocket, { WebSocketServer } from "ws";
@@ -19,6 +21,12 @@ import messages from "./routes/message";
 import reviews from "./routes/review";
 import skills from "./routes/skill";
 import users from "./routes/user";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const jsonwebtoken = <any>_jsonwebtoken;
 
@@ -62,6 +70,19 @@ app.get("/api/healthz", (c: Context) => {
   return c.text("OK");
 });
 
+app.get("/:filename", (c: Context) => {
+  console.log("hello")
+  const filename = c.req.param("filename");
+  const filePath = path.join(__dirname, filename);
+
+  if (fs.existsSync(filePath)) {
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    return c.text(fileContent);
+  } else {
+    return c.text("File not found", 404);
+  }
+});
+
 // Error handling middleware
 app.onError((err, c) => {
   console.error(`${err}`);
@@ -91,7 +112,7 @@ wss.on("connection", (ws: any) => {
       const dataSave = JSON.parse(data);
       // Find or create conversation
       // @ts-ignore
-      let conversation = null; //conversationId:  6691022246648914c2b5a7b5
+      let conversation = null;
 
       if (dataSave.conversationId === "" || dataSave.conversationId === undefined || dataSave.conversationId === null) {
         console.log("conversationId is empty");
