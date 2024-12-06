@@ -149,7 +149,6 @@
   <iframe id="call-frame"></iframe>
   <div class="flex flex-col justify-between md:flex-row gap-6 container mx-auto" v-if="!isLoading">
     <div class="w-2/3">
-      <!-- <h1 class="text-4xl font-bold text-primary w-full mb-3">{{ announcement.title }}</h1> -->
       <h1 class="text-4xl font-bold text-primary w-full mb-3" v-html="announcement.title"></h1>
       <h3 class="text-xl text-gray-600 font-bold mb-1">Lieux du cours</h3>
 
@@ -179,7 +178,6 @@
       </div>
       <h3 class="text-xl text-gray-600 font-bold mb-1">A propos du cours</h3>
       <div class="mb-16">
-        <!-- <p>{{ announcement.description }}</p> -->
         <p v-html="announcement.description"> </p>
       </div>
 

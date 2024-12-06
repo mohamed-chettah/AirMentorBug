@@ -60,27 +60,7 @@ announcements.get("/category/:id", async (c: Context) => {
 
 });
 
-// announcements.post("/", async (c) => {
-//   const body = await c.req.json();
 
-//   try {
-//     // Vulnérabilité : Acceptation des données utilisateur sans validation ni échappement
-//     const newAnnouncement = new Announcement(body);
-//     const saveAnnouncement = await newAnnouncement.save();
-
-//     // Retourne les données créées directement, y compris le script malveillant
-//     return c.json(saveAnnouncement, 201);
-//   } catch (error: unknown) {
-//     return c.json(
-//       {
-//         message: "Error creating announcement",
-//         // @ts-ignore
-//         details: error._message,
-//       },
-//       400
-//     );
-//   }
-// });
 
 announcements.post("/", async (c) => {
   const body = await c.req.json();
