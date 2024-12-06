@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Exposer le port sur lequel l'API écoute (par défaut : 3000, à ajuster si nécessaire)
-EXPOSE 3000
+EXPOSE 3001
 
 # Commande pour démarrer l'application en mode développement
 CMD ["npm", "run", "dev"]
